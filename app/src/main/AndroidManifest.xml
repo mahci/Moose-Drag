@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.VIBRATE"
+        android:required="true" />
+    <uses-permission android:name="com.samsung.android.knox.permission.KNOX_PROXY_ADMIN_INTERNAL" />
+    <uses-permission
+        android:name="android.permission.SYSTEM_ALERT_WINDOW"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.SYSTEM_OVERLAY_WINDOW"
+        android:required="true" />
+    <uses-permission android:name="android.permission.REORDER_TASKS" />
+
+    <application
+        android:icon="@mipmap/ic_drag_drop"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_drag_drop"
+        android:supportsRtl="true"
+        android:windowSoftInputMode="adjustResize"
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+
+        <activity
+            android:name="at.aau.moose_drag.views.MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Base.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
