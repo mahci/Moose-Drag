@@ -1,4 +1,4 @@
-package at.aau.moose_drag.controller;
+package at.aau.moose_drag.control;
 
 import android.app.admin.DeviceAdminReceiver;
 import android.content.Context;

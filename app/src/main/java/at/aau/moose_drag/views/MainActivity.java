@@ -31,9 +31,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import at.aau.moose_drag.R;
-import at.aau.moose_drag.controller.Actioner;
-import at.aau.moose_drag.controller.AdminManager;
-import at.aau.moose_drag.controller.Networker;
+import at.aau.moose_drag.control.Actioner;
+import at.aau.moose_drag.control.AdminManager;
+import at.aau.moose_drag.control.Networker;
 import at.aau.moose_drag.data.Consts.*;
 import at.aau.moose_drag.experiment.Experiment;
 import at.aau.moose_drag.tools.Out;
@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             if (action == KeyEvent.ACTION_DOWN) {
                 mDownPressed = true;
 
-                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TPH);
+                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TAP_PRESS_HOLD);
 
                 if (mUpPressed) System.exit(0);
 
@@ -256,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
             if (action == KeyEvent.ACTION_DOWN) {
                 mUpPressed = true;
 
-                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TFSD);
+                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TWO_FINGER_SWIPE);
 
                 if (mDownPressed) System.exit(0);
 

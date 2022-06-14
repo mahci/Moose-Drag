@@ -1,4 +1,4 @@
-package at.aau.moose_drag.controller;
+package at.aau.moose_drag.control;
 
 import static android.view.MotionEvent.INVALID_POINTER_ID;
 
@@ -6,6 +6,8 @@ import android.graphics.PointF;
 import android.os.CountDownTimer;
 import android.view.MotionEvent;
 
+import at.aau.moose_drag.action.TapPressHold;
+import at.aau.moose_drag.action.TwoFingerSwipe;
 import at.aau.moose_drag.data.Memo;
 import at.aau.moose_drag.tools.Out;
 import at.aau.moose_drag.tools.Utils;
@@ -18,7 +20,7 @@ public class Actioner {
     private static Actioner instance; // Singelton instance
     // -------------------------------------------------------------------------------
 
-    private TECHNIQUE mActiveTech = TECHNIQUE.TFSD;
+    private TECHNIQUE mActiveTech = TECHNIQUE.TWO_FINGER_SWIPE;
 
     private final int PPI = 312; // For calculating movement in mm
 
@@ -44,15 +46,10 @@ public class Actioner {
     private final double MIN_UP_DELY_mm = 2; // mm
     private final int TAP_TIMEOUT = 200; // ms
 
-    private CountDownTimer TAP_TIMER = new CountDownTimer(TAP_TIMEOUT, 10) {
-        @Override
-        public void onTick(long millisUntilFinished) {}
+    private TwoFingerSwipe mTwoFingerSwipe;
+    private TapPressHold mTapPressHold;
 
-        @Override
-        public void onFinish() {
-            mPressedFirst = false;
-        }
-    };
+    private CountDownTimer mTapTimer;
 
     // -------------------------------------------------------------------------------
 
@@ -63,6 +60,21 @@ public class Actioner {
     public static Actioner get() {
         if (instance == null) instance = new Actioner();
         return instance;
+    }
+
+    private Actioner() {
+        mTwoFingerSwipe = new TwoFingerSwipe();
+        mTapPressHold = new TapPressHold();
+
+         mTapTimer = new CountDownTimer(TAP_TIMEOUT, 10) {
+            @Override
+            public void onTick(long millisUntilFinished) {}
+
+            @Override
+            public void onFinish() {
+                mPressedFirst = false;
+            }
+        };
     }
 
     /**
@@ -112,8 +124,8 @@ public class Actioner {
         String TAG = NAME + "drag";
 
         switch (mActiveTech) {
-        case TPH: dragTPH(event); break;
-        case TFSD: dragTFSD(event); break;
+        case TAP_PRESS_HOLD: mTapPressHold.act(event); break;
+        case TWO_FINGER_SWIPE: mTwoFingerSwipe.act(event); break;
         }
     }
 
@@ -196,7 +208,7 @@ public class Actioner {
             mPressedSecond = false;
 
             // Start the count down
-            TAP_TIMER.start();
+            mTapTimer.start();
         }
         else { // Tapped + press
             Memo grabMemo = new Memo("DRAG", "GRAB", 0, 0);
@@ -206,7 +218,7 @@ public class Actioner {
             mTapped = false;
             mPressedSecond = true;
 
-            TAP_TIMER.cancel();
+            mTapTimer.cancel();
         }
 
         Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);

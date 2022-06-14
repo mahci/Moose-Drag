@@ -1,4 +1,4 @@
-package at.aau.moose_drag.controller;
+package at.aau.moose_drag.control;
 
 import static at.aau.moose_drag.data.Consts.STRINGS.BLOCK;
 import static at.aau.moose_drag.data.Consts.STRINGS.END;

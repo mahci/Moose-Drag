@@ -1,4 +1,4 @@
-package at.aau.moose_drag.controller;
+package at.aau.moose_drag.control;
 
 import static at.aau.moose_drag.data.Consts.STRINGS.*;
 import static at.aau.moose_drag.data.Consts.INTS.*;
@@ -21,6 +21,7 @@ import java.util.concurrent.Executors;
 
 import at.aau.moose_drag.data.Memo;
 import at.aau.moose_drag.tools.Out;
+import at.aau.moose_drag.tools.Utils;
 import io.reactivex.rxjava3.core.Observable;
 
 @SuppressWarnings("ALL")
@@ -57,7 +58,7 @@ public class Networker {
                     socket = new Socket(DESKTOP_IP, DESKTOP_PORT);
 
                     Log.d(TAG, "Connection successful!");
-                    vibrate(SUCCESS_VIBRATE_DUR);
+                    Utils.vibrate(SUCCESS_VIBRATE_DUR);
 
                     // Start the main activity part
                     Message closeDialogMssg = new Message();
@@ -201,9 +202,9 @@ public class Networker {
      * Vibrate for millisec
      * @param millisec time in milliseconds
      */
-    private void vibrate(long millisec) {
-        if (vibrator != null) vibrator.vibrate(millisec);
-    }
+//    private void vibrate(long millisec) {
+//        if (vibrator != null) vibrator.vibrate(millisec);
+//    }
 
     /**
      * Set the main handler (to MainActivity)
