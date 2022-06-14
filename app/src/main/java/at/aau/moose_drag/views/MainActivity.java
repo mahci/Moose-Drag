@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         // Setting
         executorService = Executors.newSingleThreadExecutor();
         dialogBuilder = new AlertDialog.Builder(this);
-        Networker.get().setVibrator((Vibrator) getSystemService(VIBRATOR_SERVICE));
+        Utils.setVibrator((Vibrator) getSystemService(VIBRATOR_SERVICE));
         Networker.get().setMainHandler(mainHandler);
 
         // Init
@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
             ViewConfiguration vc = ViewConfiguration.get(this.getContext());
             int slop = vc.getScaledTouchSlop();
-            Out.d(TAG, "Slop px: " + slop, "mm: " + Utils.px2mm(slop));
+//            Out.d(TAG, "Slop px: " + slop, "mm: " + Utils.px2mm(slop));
             return super.onTouchEvent(event);
         }
         //------------------------------------------------------

@@ -7,6 +7,7 @@ import android.view.MotionEvent;
 
 import at.aau.moose_drag.control.Networker;
 import at.aau.moose_drag.data.Memo;
+import at.aau.moose_drag.tools.Out;
 import at.aau.moose_drag.tools.Utils;
 
 import static at.aau.moose_drag.data.Consts.*;
@@ -37,7 +38,7 @@ public class TwoFingerSwipe {
      * @param event MotionEvent
      */
     public void act(MotionEvent event) {
-
+        Out.d(NAME, "acting...");
         switch (event.getActionMasked()) {
 
         case MotionEvent.ACTION_DOWN: {

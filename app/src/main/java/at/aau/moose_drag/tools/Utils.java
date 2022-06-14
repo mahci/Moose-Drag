@@ -30,7 +30,7 @@ public class Utils {
      * Set the vibrator
      * @param vib Vibrator
      */
-    public static void setVibrater(Vibrator vib) {
+    public static void setVibrator(Vibrator vib) {
         mVibrator = vib;
     }
 

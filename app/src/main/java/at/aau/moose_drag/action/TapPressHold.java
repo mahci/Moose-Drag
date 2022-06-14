@@ -8,12 +8,14 @@ import android.view.MotionEvent;
 
 import at.aau.moose_drag.control.Networker;
 import at.aau.moose_drag.data.Memo;
+import at.aau.moose_drag.tools.Out;
 import at.aau.moose_drag.tools.Utils;
+import at.aau.moose_drag.views.MainActivity;
 
 import static at.aau.moose_drag.data.Consts.*;
 
 public class TapPressHold {
-    private final String NAME = "TwoFingerSwipe/";
+    private final String NAME = "TapPressHold/";
 
     // Constants
     private final int TAP_TIMEOUT = 200; // ms
@@ -29,15 +31,7 @@ public class TapPressHold {
     private boolean mGrabbed = false;
 
     // Timers
-    private CountDownTimer TAP_TIMER = new CountDownTimer(TAP_TIMEOUT, 10) {
-        @Override
-        public void onTick(long millisUntilFinished) {}
-
-        @Override
-        public void onFinish() {
-            mPressedFirst = false;
-        }
-    };
+    private CountDownTimer mTapTimer;
 
     // Methods ----------------------------------------------------------------------------
     public TapPressHold() {
@@ -49,6 +43,19 @@ public class TapPressHold {
      * @param event MotionEvent
      */
     public void act(MotionEvent event) {
+        Out.d(NAME, "acting...");
+
+        if (mTapTimer == null) {
+            mTapTimer = new CountDownTimer(TAP_TIMEOUT, 10) {
+                @Override
+                public void onTick(long millisUntilFinished) {}
+
+                @Override
+                public void onFinish() {
+                    mPressedFirst = false;
+                }
+            };
+        }
 
         switch (event.getActionMasked()) {
 
@@ -123,7 +130,7 @@ public class TapPressHold {
 
             mNumPointers = 0;
 
-            liftOff();
+            allLiftOff();
 
             break;
         }
@@ -139,13 +146,13 @@ public class TapPressHold {
             mPressedSecond = false;
 
             // Start the count down
-            TAP_TIMER.start();
+            mTapTimer.start();
         }
         else { // Tapped + press
             grab();
         }
 
-//        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
+        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
     }
 
     private void liftOff() {
@@ -153,17 +160,35 @@ public class TapPressHold {
 
         if (mPressedFirst) {
             mTapped = true;
+
             mPressedFirst = false;
             mPressedSecond = false;
             mGrabbed = false;
 
             // TODO: Another Timeout?
+        } else if (mPressedSecond) {
+//            release();
+        }
 
+        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
+    }
+
+    private void allLiftOff() {
+        final String TAG = NAME + "allLiftOff";
+
+        if (mPressedFirst) {
+            mTapped = true;
+
+            mPressedFirst = false;
+            mPressedSecond = false;
+            mGrabbed = false;
+
+            // TODO: Another Timeout?
         } else if (mPressedSecond) {
             release();
         }
 
-//        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
+        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
     }
 
     private void grab() {
@@ -177,7 +202,7 @@ public class TapPressHold {
         mGrabbed = true;
 
         // Cancel the tap timer
-        TAP_TIMER.cancel();
+        mTapTimer.cancel();
     }
 
     private void release() {

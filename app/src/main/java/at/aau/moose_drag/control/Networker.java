@@ -41,7 +41,7 @@ public class Networker {
     private ExecutorService executor;
     private PrintWriter outPW;
     private BufferedReader inBR;
-    private Vibrator vibrator;
+//    private Vibrator vibrator;
     private Handler mainThreadHandler;
 
     // -------------------------------------------------------------------------------
@@ -218,9 +218,9 @@ public class Networker {
      * Set the vibrator (called from the MainActivity)
      * @param vib Vibrator from system
      */
-    public void setVibrator(Vibrator vib) {
-        vibrator = vib;
-    }
+//    public void setVibrator(Vibrator vib) {
+//        vibrator = vib;
+//    }
 
 
 
