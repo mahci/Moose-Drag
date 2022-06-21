@@ -1,5 +1,6 @@
 package at.aau.moose_drag.tools;
 
+import android.annotation.SuppressLint;
 import android.os.Vibrator;
 
 public class Utils {
@@ -15,6 +16,15 @@ public class Utils {
      */
     public static double px2mm(double px) {
         return (px / PPI) * 25.4;
+    }
+
+    /**
+     * Conver px to mm
+     * @param px Pixels
+     * @return mm equivalent
+     */
+    public static double mm2px(double mm) {
+        return (mm / 25.4) * PPI;
     }
 
     /**
@@ -40,6 +50,16 @@ public class Utils {
      */
     public static void vibrate(long millisec) {
         if (mVibrator != null) mVibrator.vibrate(millisec);
+    }
+
+    /**
+     * Get the input with #.###
+     * @param input double
+     * @return String
+     */
+    @SuppressLint("DefaultLocale")
+    public static String double3Dec(double input) {
+        return String.format("%.3f", input);
     }
 
 }

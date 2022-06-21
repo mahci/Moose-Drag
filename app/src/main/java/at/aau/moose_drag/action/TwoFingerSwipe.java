@@ -18,6 +18,7 @@ public class TwoFingerSwipe {
     // Constants
     private final double MIN_DOWN_dY_mm = 2; // mm
     private final double MIN_UP_dY_mm = 2; // mm
+    private final int BASE_VIB_DUR = 60; // Base vibration duration (grab, rel + 20, rev + 40)
 
     // Flags
 
@@ -136,6 +137,8 @@ public class TwoFingerSwipe {
         Memo grabMemo = new Memo(STRINGS.DRAG, STRINGS.GRAB, 0, 0);
         Networker.get().sendMemo(grabMemo);
 
+        Utils.vibrate(BASE_VIB_DUR);
+
         mGrabbed = true;
     }
 
@@ -143,12 +146,16 @@ public class TwoFingerSwipe {
         Memo relMemo = new Memo(STRINGS.DRAG, STRINGS.RELEASE, 0, 0);
         Networker.get().sendMemo(relMemo);
 
+        Utils.vibrate(BASE_VIB_DUR + 20);
+
         mGrabbed = false;
     }
 
     private void revert() {
         Memo relMemo = new Memo(STRINGS.DRAG, STRINGS.REVERT, 0, 0);
         Networker.get().sendMemo(relMemo);
+
+        Utils.vibrate(BASE_VIB_DUR + 40);
 
         mGrabbed = false;
     }

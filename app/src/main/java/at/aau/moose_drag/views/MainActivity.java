@@ -33,9 +33,11 @@ import java.util.concurrent.Executors;
 import at.aau.moose_drag.R;
 import at.aau.moose_drag.control.Actioner;
 import at.aau.moose_drag.control.AdminManager;
+import at.aau.moose_drag.control.Logger;
 import at.aau.moose_drag.control.Networker;
 import at.aau.moose_drag.data.Consts.*;
 import at.aau.moose_drag.experiment.Experiment;
+import at.aau.moose_drag.log.MotionEventLog;
 import at.aau.moose_drag.tools.Out;
 import at.aau.moose_drag.tools.Utils;
 
@@ -205,11 +207,16 @@ public class MainActivity extends AppCompatActivity {
         @SuppressLint("ClickableViewAccessibility")
         @Override
         public boolean onTouchEvent(MotionEvent event) {
-            Actioner.get().drag(event);
-//            Actioner.get().printSamples(event);
+            // Ignore the bottom 3 cm
+            if (event.getY() < Utils.mm2px(80)) {
+                Actioner.get().drag(event);
 
-            ViewConfiguration vc = ViewConfiguration.get(this.getContext());
-            int slop = vc.getScaledTouchSlop();
+                // LOG
+                Logger.get().logMotionEvent(new MotionEventLog(event));
+            }
+
+//            ViewConfiguration vc = ViewConfiguration.get(this.getContext());
+//            int slop = vc.getScaledTouchSlop();
 //            Out.d(TAG, "Slop px: " + slop, "mm: " + Utils.px2mm(slop));
             return super.onTouchEvent(event);
         }
@@ -232,42 +239,42 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-        int action = event.getAction();
-        int keyCode = event.getKeyCode();
-        switch (keyCode) {
-
-        case KeyEvent.KEYCODE_VOLUME_UP:
-            if (action == KeyEvent.ACTION_DOWN) {
-                mDownPressed = true;
-
-                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TAP_PRESS_HOLD);
-
-                if (mUpPressed) System.exit(0);
-
-            } else if (action == KeyEvent.ACTION_UP) {
-                mDownPressed = false;
-            }
-
-            return true;
-
-        case KeyEvent.KEYCODE_VOLUME_DOWN:
-            if (action == KeyEvent.ACTION_DOWN) {
-                mUpPressed = true;
-
-                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TWO_FINGER_SWIPE);
-
-                if (mDownPressed) System.exit(0);
-
-            } else if (action == KeyEvent.ACTION_UP) {
-                mUpPressed = false;
-            }
-
-            return true;
-        default:
-            return super.dispatchKeyEvent(event);
-        }
-    }
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//        int action = event.getAction();
+//        int keyCode = event.getKeyCode();
+//        switch (keyCode) {
+//
+//        case KeyEvent.KEYCODE_VOLUME_UP:
+//            if (action == KeyEvent.ACTION_DOWN) {
+//                mDownPressed = true;
+//
+//                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TAP_PRESS_HOLD);
+//
+//                if (mUpPressed) System.exit(0);
+//
+//            } else if (action == KeyEvent.ACTION_UP) {
+//                mDownPressed = false;
+//            }
+//
+//            return true;
+//
+//        case KeyEvent.KEYCODE_VOLUME_DOWN:
+//            if (action == KeyEvent.ACTION_DOWN) {
+//                mUpPressed = true;
+//
+//                Actioner.get().setActiveTech(Experiment.TECHNIQUE.TWO_FINGER_SWIPE);
+//
+//                if (mDownPressed) System.exit(0);
+//
+//            } else if (action == KeyEvent.ACTION_UP) {
+//                mUpPressed = false;
+//            }
+//
+//            return true;
+//        default:
+//            return super.dispatchKeyEvent(event);
+//        }
+//    }
 
 }

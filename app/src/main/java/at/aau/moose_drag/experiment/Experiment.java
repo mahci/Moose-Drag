@@ -7,4 +7,8 @@ public class Experiment {
         private static final TECHNIQUE[] values = values();
     }
 
+    public enum TASK {
+        BOX, BAR, PEEK, TUNNEL;
+    }
+
 }

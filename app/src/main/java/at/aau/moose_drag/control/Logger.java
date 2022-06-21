@@ -1,28 +1,28 @@
 package at.aau.moose_drag.control;
 
-import static at.aau.moose_drag.data.Consts.STRINGS.BLOCK;
 import static at.aau.moose_drag.data.Consts.STRINGS.END;
 import static at.aau.moose_drag.data.Consts.STRINGS.EXP_ID;
+import static at.aau.moose_drag.data.Consts.STRINGS.GENLOG;
 import static at.aau.moose_drag.data.Consts.STRINGS.SP;
-import static at.aau.moose_drag.data.Consts.STRINGS.TECH;
-import static at.aau.moose_drag.data.Consts.STRINGS.TRIAL;
-import static at.aau.moose_drag.data.Consts.STRINGS.TSK;
 
-import android.annotation.SuppressLint;
 import android.os.Environment;
-import android.view.MotionEvent;
 
-import androidx.annotation.NonNull;
+import com.google.gson.Gson;
 
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import at.aau.moose_drag.data.Memo;
+import at.aau.moose_drag.log.GeneralLog;
+import at.aau.moose_drag.log.MotionEventLog;
 import at.aau.moose_drag.tools.Out;
 
-import static android.view.MotionEvent.*;
+import static at.aau.moose_drag.experiment.Experiment.*;
 
 public class Logger {
     private final static String NAME = "Logger/";
@@ -31,10 +31,11 @@ public class Logger {
 
     private static String mLogDirectory; // Main folder for logs
 
-    private GeneralInfo mGenInfo = new GeneralInfo();
+    private GeneralLog mGenLog;
+    private String mPcId;
 
-    private String mMotionEventLogPath;
-    private PrintWriter mMotionEventLogPW;
+    private PrintWriter mBoxMELogPW, mBarMELogPW, mPeekMELogPW, mTunnelMELogPW;
+    private PrintWriter mActiveLogFilePW;
 
     // -------------------------------------------------------------------------------------------
     public static Logger get() {
@@ -47,9 +48,106 @@ public class Logger {
      */
     public Logger() {
         // Create the log dir (if not existed)
-        mLogDirectory = Environment.getExternalStorageDirectory() + "/Moose_Scroll_Log/";
+        mLogDirectory = Environment.getExternalStorageDirectory() + "/Moose_Drag_Log/";
         boolean res = createDir(mLogDirectory);
         Out.d(NAME, mLogDirectory, res);
+    }
+
+    /**
+     * Extract log info from Memo
+     * @param memo Memo
+     */
+    public void setLogInfo(Memo memo) {
+        switch (memo.getMode()) {
+            case EXP_ID: {
+                mPcId = memo.getValue1Str();
+                openLogFiles();
+
+                break;
+            }
+
+            case GENLOG: {
+                Out.d(NAME, memo);
+                mGenLog = new Gson().fromJson(memo.getValue1Str(), GeneralLog.class);
+                setActiveLogFile();
+
+                break;
+            }
+
+            case END: {
+                closeLogs();
+
+                break;
+            }
+
+        }
+    }
+
+    /**
+     * Log MotionEventInfo
+     * @param meventLog MotionEventInfo
+     */
+    public void logMotionEvent(MotionEventLog meventLog) {
+        try {
+            if (mActiveLogFilePW == null) setActiveLogFile();
+
+            mActiveLogFilePW.println(mGenLog + SP + meventLog);
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getLogHeaders() {
+        return GeneralLog.getLogHeader() + SP + MotionEventLog.getLogHeader();
+    }
+
+    private void openLogFiles() {
+        final String boxLogFilePath = mLogDirectory + mPcId + "_" + TASK.BOX + "_MOEV.txt";
+        final String barLogFilePath = mLogDirectory + mPcId + "_" + TASK.BAR + "_MOEV.txt";
+        final String peekLogFilePath = mLogDirectory + mPcId + "_" + TASK.PEEK + "_MOEV.txt";
+        final String tunnelLogFilePath = mLogDirectory + mPcId + "_" + TASK.TUNNEL + "_MOEV.txt";
+
+        try {
+            mBoxMELogPW = new PrintWriter(
+                    new FileOutputStream(boxLogFilePath, true), true);
+            if (isFileEmpty(boxLogFilePath)) mBoxMELogPW.println(getLogHeaders());
+
+            mBarMELogPW = new PrintWriter(
+                    new FileOutputStream(barLogFilePath, true), true);
+            if (isFileEmpty(barLogFilePath)) mBarMELogPW.println(getLogHeaders());
+
+            mPeekMELogPW = new PrintWriter(
+                    new FileOutputStream(peekLogFilePath, true), true);
+            if (isFileEmpty(peekLogFilePath)) mPeekMELogPW.println(getLogHeaders());
+
+            mTunnelMELogPW = new PrintWriter(
+                    new FileOutputStream(tunnelLogFilePath, true), true);
+            if (isFileEmpty(tunnelLogFilePath)) mTunnelMELogPW.println(getLogHeaders());
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setActiveLogFile() {
+        openLogFiles();
+
+        if (mGenLog != null) {
+            switch (mGenLog.task) {
+            case BOX: mActiveLogFilePW = mBoxMELogPW; break;
+            case BAR: mActiveLogFilePW = mBarMELogPW; break;
+            case PEEK: mActiveLogFilePW = mPeekMELogPW; break;
+            case TUNNEL: mActiveLogFilePW = mTunnelMELogPW; break;
+            }
+        }
+    }
+
+    /**
+     * Close all the log files
+     */
+    public void closeLogs() {
+        if (mActiveLogFilePW != null) mActiveLogFilePW.close();
     }
 
     /**
@@ -64,230 +162,18 @@ public class Logger {
     }
 
     /**
-     * Extract log info from Memo
-     * @param memo Memo
+     * Check if a file is empty
+     * @param filePath File path
+     * @return True (empty), False (not empty)
      */
-    public void setLogInfo(Memo memo) {
-        switch (memo.getMode()) {
-            case EXP_ID: {
-                logExperimentStart(memo.getValue1Str());
-            }
-
-            case TECH + "_" + TSK: {
-
-            }
-
-            case BLOCK + "_" + TRIAL: {
-
-            }
-
-            case END: {
-                closeLogs();
-            }
-
-        }
-    }
-
-
-    /**
-     * Log the start of an experiment
-     * @param expLogId String containing the experiment info
-     */
-    public void logExperimentStart(String expLogId) {
-        final String TAG = NAME + "logParticipant";
-
-    }
-
-    /**
-     * Log MotionEventInfo
-     * @param meventInfo MotionEventInfo
-     */
-    public void logMotionEventInfo(MotionEventInfo meventInfo) {
+    public static boolean isFileEmpty(String filePath) {
         try {
-            if (mMotionEventLogPW == null) { // Open only if not opened before
-                mMotionEventLogPW = new PrintWriter(
-                        new FileWriter(mMotionEventLogPath, true));
-            }
-
-            mMotionEventLogPW.println(mGenInfo + SP + meventInfo);
-            mMotionEventLogPW.flush();
-
-        } catch (NullPointerException | IOException e) {
+            final BufferedReader br = new BufferedReader(new FileReader(filePath));
+            return br.readLine() == null;
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return false;
     }
-
-    /**
-     * Close all the log files
-     */
-    public void closeLogs() {
-        if (mMotionEventLogPW != null) mMotionEventLogPW.close();
-    }
-
-    /**
-     * Get the input with #.###
-     * @param input double
-     * @return String
-     */
-    @SuppressLint("DefaultLocale")
-    public static String double3Dec(double input) {
-        return String.format("%.3f", input);
-    }
-
-    /**
-     * Get the string for a MotionEvent.PointerCoord
-     * @return String (semi-colon separated)
-     */
-    public static String pointerCoordsToStr(PointerCoords inPC) {
-        return double3Dec(inPC.orientation) + SP + 
-                double3Dec(inPC.pressure) + SP + 
-                double3Dec(inPC.size) + SP +
-                double3Dec(inPC.toolMajor) + SP + 
-                double3Dec(inPC.toolMinor) + SP + 
-                double3Dec(inPC.touchMajor) + SP + 
-                double3Dec(inPC.touchMinor) + SP + 
-                double3Dec(inPC.x) + SP + 
-                double3Dec(inPC.y);
-
-    }
-
-    /**
-     * Truly GET the PointerCoords!
-     * @param me MotionEvent
-     * @param pointerIndex int pointer index
-     * @return String
-     */
-    public static String pointerCoordsToStr(MotionEvent me, int pointerIndex) {
-        PointerCoords result = new PointerCoords();
-        me.getPointerCoords(pointerIndex, result);
-        return pointerCoordsToStr(result);
-    }
-
-    // -------------------------------------------------------------------------------------------
-    // General info
-    public static class GeneralInfo {
-
-    }
-
-    // MotionEvent info
-    public static class MotionEventInfo {
-        public MotionEvent event;
-
-        public MotionEventInfo(MotionEvent me) {
-            event = me;
-        }
-
-        public static String getLogHeader() {
-            return "action" + SP +
-
-                    "flags" + SP +
-                    "edge_flags" + SP +
-                    "source" + SP +
-
-                    "event_time" + SP +
-                    "down_time" + SP +
-
-                    "number_pointers" + SP +
-
-                    "finger_1_index" + SP +
-                    "finger_1_id" + SP +
-                    "finger_1_orientation" + SP +
-                    "finger_1_pressure" + SP +
-                    "finger_1_size" + SP +
-                    "finger_1_toolMajor" + SP +
-                    "finger_1_toolMinor" + SP +
-                    "finger_1_touchMajor" + SP +
-                    "finger_1_touchMinor" + SP +
-                    "finger_1_x" + SP +
-                    "finger_1_y" + SP +
-
-                    "finger_2_index" + SP +
-                    "finger_2_id" + SP +
-                    "finger_2_orientation" + SP +
-                    "finger_2_pressure" + SP +
-                    "finger_2_size" + SP +
-                    "finger_2_toolMajor" + SP +
-                    "finger_2_toolMinor" + SP +
-                    "finger_2_touchMajor" + SP +
-                    "finger_2_touchMinor" + SP +
-                    "finger_2_x" + SP +
-                    "finger_2_y" + SP +
-
-                    "finger_3_index" + SP +
-                    "finger_3_id" + SP +
-                    "finger_3_orientation" + SP +
-                    "finger_3_pressure" + SP +
-                    "finger_3_size" + SP +
-                    "finger_3_toolMajor" + SP +
-                    "finger_3_toolMinor" + SP +
-                    "finger_3_touchMajor" + SP +
-                    "finger_3_touchMinor" + SP +
-                    "finger_3_x" + SP +
-                    "finger_3_y" + SP +
-
-                    "finger_4_index" + SP +
-                    "finger_4_id" + SP +
-                    "finger_4_orientation" + SP +
-                    "finger_4_pressure" + SP +
-                    "finger_4_size" + SP +
-                    "finger_4_toolMajor" + SP +
-                    "finger_4_toolMinor" + SP +
-                    "finger_4_touchMajor" + SP +
-                    "finger_4_touchMinor" + SP +
-                    "finger_4_x" + SP +
-                    "finger_4_y" + SP +
-
-                    "finger_5_index" + SP +
-                    "finger_5_id" + SP +
-                    "finger_5_orientation" + SP +
-                    "finger_5_pressure" + SP +
-                    "finger_5_size" + SP +
-                    "finger_5_toolMajor" + SP +
-                    "finger_5_toolMinor" + SP +
-                    "finger_5_touchMajor" + SP +
-                    "finger_5_touchMinor" + SP +
-                    "finger_5_x" + SP +
-                    "finger_5_y";
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            StringBuilder result = new StringBuilder();
-
-            result.append(event.getActionMasked()).append(SP);
-
-            result.append("0x").append(Integer.toHexString(event.getFlags())).append(SP);
-            result.append("0x").append(Integer.toHexString(event.getEdgeFlags())).append(SP);
-            result.append("0x").append(Integer.toHexString(event.getSource())).append(SP);
-
-            result.append(event.getEventTime()).append(SP);
-            result.append(event.getDownTime()).append(SP);
-
-            // Pointers' info (for 0 - (nPointer -1) => real values | for the rest to 5 => dummy)
-            int nPointers = event.getPointerCount();
-            result.append(nPointers).append(SP);
-            int pi;
-            for(pi = 0; pi < nPointers; pi++) {
-                result.append(pi).append(SP); // Index
-                result.append(event.getPointerId(pi)).append(SP); // Id
-                // PointerCoords
-                result.append(pointerCoordsToStr(event, pi)).append(SP);
-            }
-
-            for (pi = nPointers; pi < 5; pi++) {
-                result.append(-1).append(SP); // Index = -1
-                result.append(-1).append(SP); // Id = -1
-                // PointerCoords = empty
-                result.append(pointerCoordsToStr(new MotionEvent.PointerCoords()))
-                        .append(SP);
-            }
-
-            String resStr = result.toString();
-            return resStr.substring(0, resStr.length() - 1); // Remove the last SP
-        }
-    }
-
-
-
 }

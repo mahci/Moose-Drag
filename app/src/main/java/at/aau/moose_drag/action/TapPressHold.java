@@ -20,6 +20,7 @@ public class TapPressHold {
     // Constants
     private final int TAP_TIMEOUT = 200; // ms
     private final double MIN_UP_dY_mm = 2; // mm
+    private final int BASE_VIB_DUR = 60; // Base vibration duration (grab, rel + 20, rev + 40)
 
     // Tracking
     private int mActivePointerId = INVALID_POINTER_ID;
@@ -192,8 +193,12 @@ public class TapPressHold {
     }
 
     private void grab() {
+        final String TAG = NAME + "grab";
+
         Memo grabMemo = new Memo(STRINGS.DRAG, STRINGS.GRAB, 0, 0);
         Networker.get().sendMemo(grabMemo);
+
+        Utils.vibrate(BASE_VIB_DUR);
 
         // Change flags
         mPressedFirst = false;
@@ -203,22 +208,32 @@ public class TapPressHold {
 
         // Cancel the tap timer
         mTapTimer.cancel();
+
+        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
     }
 
     private void release() {
+        final String TAG = NAME + "release";
+
         Memo relMemo = new Memo(STRINGS.DRAG, STRINGS.RELEASE, 0, 0);
         Networker.get().sendMemo(relMemo);
+
+        Utils.vibrate(BASE_VIB_DUR + 20);
 
         // Reset flags
         mPressedFirst = false;
         mPressedSecond = false;
         mTapped = false;
         mGrabbed = false;
+
+        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
     }
 
     private void revert() {
         Memo relMemo = new Memo(STRINGS.DRAG, STRINGS.REVERT, 0, 0);
         Networker.get().sendMemo(relMemo);
+
+        Utils.vibrate(BASE_VIB_DUR + 40);
 
         // Reset flags
         mPressedFirst = false;
