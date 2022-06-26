@@ -13,43 +13,20 @@ public class Memo {
 
     private String action;
     private String mode;
-    private String value1;
-    private String value2;
+    private String value1 = "-";
+    private String value2 = "-";
 
     /**
-     * Constructor
-     * @param act Action Mostly "SCROLL"
-     * @param md Mode DRAG or RT
-     * @param v1 String value1
-     * @param v2 String value2
+     * More general constructor
+     * @param act Action
+     * @param md Mode
+     * @param values list of values (currently up to two is supported)
      */
-    public Memo(String act, String md, String v1, String v2) {
+    public Memo(String act, String md, Object... values) {
         action = act;
         mode = md;
-        value1 = v1;
-        value2 = v2;
-    }
-
-    public Memo(String act, TECHNIQUE tech, String v1, String v2) {
-        this(act, tech.toString(), v1, v2);
-    }
-
-    public Memo(String act, TECHNIQUE tech, double v1, double v2) {
-        this(act, tech.toString(), v1, v2);
-    }
-
-    /**
-     * Constructor
-     * @param act Action Mostly "SCROLL"
-     * @param md Mode DRAG or RT
-     * @param v1 Double value Movement along X
-     * @param v2 Double value Movement along Y
-     */
-    public Memo(String act, String md, double v1, double v2) {
-        action = act;
-        mode = md;
-        value1 = String.valueOf(v1);
-        value2 = String.valueOf(v2);
+        if (values.length == 1) value1 = String.valueOf(values[0]);
+        if (values.length == 2) value2 = String.valueOf(values[1]);
     }
 
     /**
@@ -79,65 +56,37 @@ public class Memo {
     }
 
     /**
-     * Convert and return the value 1
-     * @return Int value 1
+     * Get one of the values in String
+     * @param valInd Index of the value
+     * @return String
      */
-    public int getValue1Int() {
-        try {
-            return (int) Double.parseDouble(value1);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-
-    }
-
-    public String getValue1Str() {
-        return value1;
+    public String getStrValue(int valInd) {
+        if (valInd == 1) return value1;
+        if (valInd == 2) return value2;
+        else return "";
     }
 
     /**
-     * Convert and return the value 2
-     * @return Int value 2
+     * Get one of the values in Double
+     * @param valInd Index of the value
+     * @return Double
      */
-    public int getValue2Int() {
-        try {
-            return (int) Double.parseDouble(value2);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-
-    }
-
-    public String getValue2Str() {
-        return value2;
+    public Double getDblValue(int valInd) {
+        if (valInd == 1) return Double.parseDouble(value1);
+        if (valInd == 2) return Double.parseDouble(value2);
+        else return 0.0;
     }
 
     /**
-     * Convert and return the value 1
-     * @return Double value 1
+     * Get one of the values in Int
+     * @param valInd Index of the value
+     * @return Int
      */
-    public int getValue1Double() {
-        try {
-            return (int) Double.parseDouble(value1);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-
+    public int getIntValue(int valInd) {
+        if (valInd == 1) return Integer.parseInt(value1);
+        if (valInd == 2) return Integer.parseInt(value2);
+        else return 0;
     }
-
-    /**
-     * Convert and return the value 2
-     * @return Double value 2
-     */
-    public int getValue2Double() {
-        try {
-            return (int) Double.parseDouble(value2);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-
-    }
-
 
     /**
      * Get the Memo from String
@@ -149,15 +98,15 @@ public class Memo {
 
         Memo result = new Memo();
         if (mssg != null) {
-            String[] parts = mssg.split(SP);
-            Out.d(TAG, parts.length);
+            String[] parts = mssg.split(MSP);
+
             if (parts.length == 4) {
                 result.action = parts[0];
                 result.mode = parts[1];
                 result.value1 = parts[2];
                 result.value2 = parts[3];
             } else {
-                Log.d(TAG, "Problem in parsing the memo!");
+                Out.d(TAG, "Memo string NOT 4 parts!");
             }
         }
 
@@ -171,6 +120,6 @@ public class Memo {
     @NonNull
     @Override
     public String toString() {
-        return action + SP + mode + SP + value1 + SP + value2;
+        return action + MSP + mode + MSP + value1 + MSP + value2;
     }
 }

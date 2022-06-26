@@ -4,6 +4,7 @@ public class Consts {
 
     public static class STRINGS {
         public static final String SP = ";";
+        public final static String MSP = "&";
         public static final String INTRO = "INTRO";
         public static final String MOOSE = "MOOSE";
         public final static String TECH = "TECH";

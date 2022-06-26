@@ -60,7 +60,7 @@ public class Logger {
     public void setLogInfo(Memo memo) {
         switch (memo.getMode()) {
             case EXP_ID: {
-                mPcId = memo.getValue1Str();
+                mPcId = memo.getStrValue(1);
                 openLogFiles();
 
                 break;
@@ -68,7 +68,8 @@ public class Logger {
 
             case GENLOG: {
                 Out.d(NAME, memo);
-                mGenLog = new Gson().fromJson(memo.getValue1Str(), GeneralLog.class);
+                mGenLog = new Gson().fromJson(memo.getStrValue(1), GeneralLog.class);
+                Out.d(NAME, mGenLog);
                 setActiveLogFile();
 
                 break;

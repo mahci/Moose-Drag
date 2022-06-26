@@ -74,7 +74,7 @@ public class Actioner {
 
         switch (memo.getMode()) {
             case STRINGS.TECH: {
-                mActiveTech = TECHNIQUE.valueOf(memo.getValue1Str());
+                mActiveTech = TECHNIQUE.valueOf(memo.getStrValue(1));
                 break;
             }
         }

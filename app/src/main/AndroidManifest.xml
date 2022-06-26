@@ -33,9 +33,9 @@
     <uses-permission android:name="android.permission.REORDER_TASKS" />
 
     <application
-        android:icon="@mipmap/ic_drag_drop"
+        android:icon="@mipmap/ic_drag"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_drag_drop"
+        android:roundIcon="@mipmap/ic_drag"
         android:supportsRtl="true"
         android:windowSoftInputMode="adjustResize"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen">

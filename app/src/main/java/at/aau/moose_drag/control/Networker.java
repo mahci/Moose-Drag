@@ -28,7 +28,8 @@ import io.reactivex.rxjava3.core.Observable;
 public class Networker {
     private String NAME = "Networker/";
     //-------------------------------------------------------------------------------
-    private final String DESKTOP_IP = "192.168.2.1";
+    private final String DESKTOP_IP = "192.168.0.100";
+//    private final String DESKTOP_IP = "192.168.2.1";
 //    private final String DESKTOP_IP = "192.168.178.34";
     private final int DESKTOP_PORT = 8000;
     private final long SUCCESS_VIBRATE_DUR = 500; // ms
