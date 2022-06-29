@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 import at.aau.moose_drag.data.Memo;
 import at.aau.moose_drag.tools.Out;
 import at.aau.moose_drag.tools.Utils;
+import at.aau.moose_drag.views.MainActivity;
 import io.reactivex.rxjava3.core.Observable;
 
 @SuppressWarnings("ALL")
@@ -72,7 +73,7 @@ public class Networker {
                             new OutputStreamWriter(socket.getOutputStream())),true);
 
                     // Send intro
-                    sendMemo(new Memo(INTRO, INTRO, MOOSE, ""));
+                    sendMemo(new Memo(CONNECTION, INTRO, MOOSE));
 
                     // Start receiving
                     executor.execute(new InRunnable());
@@ -131,6 +132,21 @@ public class Networker {
                         Memo memo = Memo.valueOf(mssg);
                         Out.d(TAG, "Action: " + memo.getAction());
                         switch (memo.getAction()) {
+
+                            case CONNECTION: {
+
+                                if (memo.getMode().equals(END)) {
+                                    Out.d(TAG, "Shutting down...");
+                                    executor.shutdownNow();
+                                    // Shut down the app
+                                    Message shutDownMssg = new Message();
+                                    shutDownMssg.what = SHUT_DOWN;
+                                    mainThreadHandler.sendMessage(shutDownMssg);
+                                }
+
+                                break;
+                            }
+
                             case CONFIG: {
                                 Actioner.get().config(memo);
                                 break;
@@ -179,7 +195,7 @@ public class Networker {
     public void connect() {
         String TAG = NAME + "connect";
 
-        executor.execute(new ConnectRunnable());
+        if (!executor.isShutdown()) executor.execute(new ConnectRunnable());
     }
 
     public void resetConnection() {
@@ -198,15 +214,6 @@ public class Networker {
         executor.execute(new OutRunnable(memo.toString()));
     }
 
-
-    /**
-     * Vibrate for millisec
-     * @param millisec time in milliseconds
-     */
-//    private void vibrate(long millisec) {
-//        if (vibrator != null) vibrator.vibrate(millisec);
-//    }
-
     /**
      * Set the main handler (to MainActivity)
      * @param mainHandler Handler to MainActivity
@@ -214,15 +221,5 @@ public class Networker {
     public void setMainHandler(Handler mainHandler) {
         mainThreadHandler = mainHandler;
     }
-
-    /**
-     * Set the vibrator (called from the MainActivity)
-     * @param vib Vibrator from system
-     */
-//    public void setVibrator(Vibrator vib) {
-//        vibrator = vib;
-//    }
-
-
 
 }

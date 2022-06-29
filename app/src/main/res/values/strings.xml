@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Moose-Drag</string>
-    <string name="admin_receiver_status">Admin</string>
     <string name="admin_receiver_status_enabled">Admin Enabled</string>
     <string name="admin_receiver_status_disable_warning">Disable Warning</string>
     <string name="admin_receiver_status_disabled">Admin Disabled</string>
     <string name="add_admin_extra_app_text">Admin Receiver</string>
+    <string name="admin_receiver_status">Admin</string>
+    <string name="sample_device_admin">Device Admin</string>
 </resources>

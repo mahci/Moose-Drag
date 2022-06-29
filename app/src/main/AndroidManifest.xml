@@ -38,7 +38,8 @@
         android:roundIcon="@mipmap/ic_drag"
         android:supportsRtl="true"
         android:windowSoftInputMode="adjustResize"
-        android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+        android:testOnly="true">
 
         <activity
             android:name="at.aau.moose_drag.views.MainActivity"
@@ -50,6 +51,19 @@
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </activity>
+
+        <receiver android:name=".DAReceiver"
+            android:description="@string/add_admin_extra_app_text"
+            android:label="@string/sample_device_admin"
+            android:permission="android.permission.BIND_DEVICE_ADMIN"
+            android:exported="true">
+            <meta-data
+                android:name="android.app.device_admin"
+                android:resource="@xml/device_admin"/>
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+            </intent-filter>
+        </receiver>
 
     </application>
 

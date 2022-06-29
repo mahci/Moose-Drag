@@ -53,7 +53,8 @@ public class TapPressHold {
 
                 @Override
                 public void onFinish() {
-                    mPressedFirst = false;
+                    if (mPressedFirst) mPressedFirst = false;
+                    if (mTapped) mTapped = false;
                 }
             };
         }
@@ -148,8 +149,7 @@ public class TapPressHold {
 
             // Start the count down
             mTapTimer.start();
-        }
-        else { // Tapped + press
+        } else { // Tapped + press
             grab();
         }
 
@@ -167,6 +167,7 @@ public class TapPressHold {
             mGrabbed = false;
 
             // TODO: Another Timeout?
+            mTapTimer.start();
         } else if (mPressedSecond) {
 //            release();
         }
@@ -177,6 +178,8 @@ public class TapPressHold {
     private void allLiftOff() {
         final String TAG = NAME + "allLiftOff";
 
+        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
+
         if (mPressedFirst) {
             mTapped = true;
 
@@ -185,11 +188,11 @@ public class TapPressHold {
             mGrabbed = false;
 
             // TODO: Another Timeout?
-        } else if (mPressedSecond) {
+            mTapTimer.start();
+        } else if (mGrabbed) {
             release();
         }
 
-        Out.d(TAG, "mPF, mPS, mT", mPressedFirst, mPressedSecond, mTapped);
     }
 
     private void grab() {

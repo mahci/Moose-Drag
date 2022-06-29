@@ -20,23 +20,22 @@ import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import at.aau.moose_drag.DAReceiver;
 import at.aau.moose_drag.R;
 import at.aau.moose_drag.control.Actioner;
 import at.aau.moose_drag.control.AdminManager;
 import at.aau.moose_drag.control.Logger;
 import at.aau.moose_drag.control.Networker;
 import at.aau.moose_drag.data.Consts.*;
-import at.aau.moose_drag.experiment.Experiment;
 import at.aau.moose_drag.log.MotionEventLog;
 import at.aau.moose_drag.tools.Out;
 import at.aau.moose_drag.tools.Utils;
@@ -54,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     private AlertDialog dialog; // dialog for everyting!
 
     private boolean mUpPressed, mDownPressed;
+
+    private ComponentName mAdminComponent;
     // -------------------------------------------------------------------------------
 
     // Main Handler
@@ -67,9 +68,11 @@ public class MainActivity extends AppCompatActivity {
                 drawUI();
             }
 
-//            if (mssg.what == INTS.SHOW_DLG) {
-//                showDialog("Connecting to desktop...");
-//            }
+            if (mssg.what == INTS.SHUT_DOWN) {
+                Out.d(TAG, "Finnishing the activity");
+                finishAffinity();
+                System.exit(0);
+            }
         }
     };
     // -------------------------------------------------------------------------------
@@ -122,17 +125,44 @@ public class MainActivity extends AppCompatActivity {
      * Make sure the app has adimin permissions
      */
     private void checkAdmin() {
-
         //-- Get the admin permission [for removing the status bar]
-        DevicePolicyManager mDPM = (DevicePolicyManager)
+        final DevicePolicyManager dpm = (DevicePolicyManager)
                 getSystemService(Context.DEVICE_POLICY_SERVICE);
-        ComponentName adminManager = new ComponentName(this, AdminManager.class);
-        isAdmin = mDPM.isAdminActive(adminManager);
+        mAdminComponent = DAReceiver.getComponentName(this);
+        isAdmin = dpm.isAdminActive(mAdminComponent);
+        Out.d(TAG, "Admin check", isAdmin);
+
         if (!isAdmin) {
-            // Launch the activity to have the user enable our admin.
+
             Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminManager);
+            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                    DAReceiver.getComponentName(this));
+            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                    getString(R.string.add_admin_extra_app_text));
+            Out.d(TAG, intent);
             startActivityForResult(intent, 1);
+
+//            ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
+//                    new ActivityResultContracts.StartActivityForResult(),
+//                    result -> {
+//
+//                    });
+//
+//
+//            // Launch the activity to have the user enable our admin.
+//            Out.d(TAG, "Admin check", "Launching activity...");
+//            final ComponentName deviceAdminASample = null;
+//            Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
+//            intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminASample);
+//            intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+//                    getString(R.string.add_admin_extra_app_text));
+//
+//            activityResultLauncher.launch(intent);
+//            startActivityForResult(intent, 1);
+        } else {
+//            Toast.makeText(this, "Is Admin", Toast.LENGTH_SHORT).show();
+            boolean result = dpm.setStatusBarDisabled(mAdminComponent, true);
+            Out.d(TAG, "Status Bar disabling result", result);
         }
 
     }
@@ -167,6 +197,8 @@ public class MainActivity extends AppCompatActivity {
         TouchViewGroup view = new TouchViewGroup(this);
 
         view.setBackgroundColor(Color.WHITE);
+        view.setKeepScreenOn(true);
+
         assert winManager != null;
         winManager.addView(view, params);
     }

@@ -9,6 +9,7 @@ public class Consts {
         public static final String MOOSE = "MOOSE";
         public final static String TECH = "TECH";
         public final static String CONFIG = "CONFIG";
+        public final static String CONNECTION = "CONNECTION";
         public final static String LOG = "LOG";
         public final static String EXP_ID = "EXPID"; // Id for an experiment
         public final static String GENLOG = "GENLOG";
@@ -27,6 +28,7 @@ public class Consts {
     public static class INTS {
         public static final int CLOSE_DLG = 0;
         public static final int SHOW_DLG = 1;
+        public static final int SHUT_DOWN = 2;
     }
 
 }
